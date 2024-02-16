@@ -5,24 +5,36 @@ Description: >
   
   Sample SAM Template for app
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 5
-    MemorySize: 128
+    Timeout: 30
+    MemorySize: 256
 
 Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      DockerContext: ./app
+      Dockerfile: Dockerfile
+    Properties:
+      FunctionName: sam-app
+      Role: !GetAtt LambdaFunctionRole.Arn
+      PackageType: Image
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          PARAM1: VALUE
+
   LambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: sam-app-role
       ManagedPolicyArns:
-        # add managed policy arns here
         - arn:aws:iam::aws:policy/AmazonVPCFullAccess
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          # add assume role policy here
           - Effect: "Allow"
             Principal:
               Service:
@@ -30,7 +42,6 @@ Resources:
             Action:
               - "sts:AssumeRole"
       Policies:
-        # add inline policies here
         - PolicyName: sample-lambda-policy
           PolicyDocument:
             Version: "2012-10-17"
@@ -39,30 +50,21 @@ Resources:
                 Action: 'logs:*'
                 Resource: '*'
 
-  LambdaFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Metadata:
-      DockerContext: ./app
-      Dockerfile: Dockerfile
-    Properties:
-      Role: !GetAtt LambdaFunctionRole.Arn
-      PackageType: Image
-      Architectures:
-        - x86_64 # or arm64
-      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-        Variables:
-          PARAM1: VALUE
-
   LambdaFunctionUrl:
     Type: AWS::Lambda::Url
     Properties:
       TargetFunctionArn: !GetAtt LambdaFunction.Arn
       AuthType: NONE
       Cors:
-        AllowMethods: [ 'GET', 'POST', 'PUT', 'DELETE', 'PATCH' ]
+        AllowMethods: [ 'GET', 'POST', 'PUT', 'DELETE','HEAD', 'PATCH' ]
         AllowOrigins: [ '*' ]
-        AllowHeaders: [ 'Content-Type', 'Authorization', 'X-Amz-Date', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent' ]
-        AllowCredentials: true
+
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaFunction
+      Principal: "*"
 
 Outputs:
   Endpoint:

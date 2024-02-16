@@ -1,4 +1,4 @@
-FROM golang:1.20 as build-env
+FROM golang:1.22 as build-env
 
 WORKDIR /go/src/app
 
@@ -8,7 +8,7 @@ RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o /go/bin/app
 
 FROM gcr.io/distroless/static-debian11:latest
 
-COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.7.0 /lambda-adapter /opt/extensions/lambda-adapter
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.1 /lambda-adapter /opt/extensions/lambda-adapter
 COPY --from=build-env /go/bin/app /
 
 ENV PORT=3000
