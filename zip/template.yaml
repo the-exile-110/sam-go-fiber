@@ -69,5 +69,5 @@ Resources:
 
 Outputs:
   Endpoint:
-    Description: URL for function
+    Description: "URL for function"
     Value: !GetAtt LambdaFunctionUrl.FunctionUrl
