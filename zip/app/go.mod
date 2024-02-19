@@ -1,5 +1,5 @@
 require (
-	github.com/aws/aws-lambda-go v1.41.0
+	github.com/aws/aws-lambda-go v1.46.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.1
 )
 
@@ -23,7 +23,7 @@ require (
 
 replace gopkg.in/yaml.v2 => gopkg.in/yaml.v2 v2.2.8
 
-module hello-world
+module app
 
 go 1.21
 
